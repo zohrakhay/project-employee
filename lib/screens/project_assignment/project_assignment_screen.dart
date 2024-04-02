@@ -4,7 +4,6 @@ import 'package:technical_test_mosofty/models/project.dart';
 import 'package:technical_test_mosofty/models/project_assignment.dart';
 import 'package:technical_test_mosofty/services/person_service.dart';
 import 'package:technical_test_mosofty/services/project_service.dart';
-import 'package:loading_indicator/loading_indicator.dart';
 
 class ProjectAssignmentPage extends StatefulWidget {
   const ProjectAssignmentPage({super.key});
@@ -16,8 +15,8 @@ class ProjectAssignmentPage extends StatefulWidget {
 class _ProjectAssignmentPageState extends State<ProjectAssignmentPage> {
   List<Project> projects = [];
   List<Person> persons = [];
-  late Person selectedPerson;
-  late Project selectedProject;
+  Person? selectedPerson;
+  Project? selectedProject;
   bool isLoading = true;
 
   @override
@@ -47,13 +46,22 @@ class _ProjectAssignmentPageState extends State<ProjectAssignmentPage> {
   Future<void> _assignProjectToPerson(Project project, Person person) async {
     ProjectAssignment newAssignment =
         ProjectAssignment(id: Id(idpro: project.id, idperson: person.id), project: project, person: person);
+    try {
+      await PersonService().AssignProjectToPerson(newAssignment);
 
-    await PersonService().AssignProjectToPerson(newAssignment);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Person added successfully!'),
-      ),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Projet affecté avec succès!'),
+        ),
+      );
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Une erreur s\'est produite'),
+        ),
+      );
+    }
   }
 
   @override
@@ -69,6 +77,7 @@ class _ProjectAssignmentPageState extends State<ProjectAssignmentPage> {
           Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text('Projet'),
                   DropdownButton<Project>(
@@ -79,26 +88,33 @@ class _ProjectAssignmentPageState extends State<ProjectAssignmentPage> {
                       );
                     }).toList(),
                     onChanged: (Project? selected) {
-                      selectedProject = selected!;
+                      setState(() {
+                        selectedProject = selected!;
+                      });
                     },
+                    hint: selectedProject != null ? Text('${selectedProject!.name} ') : Text('Choisissez un projet '),
                   ),
                 ],
               )),
           Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text('Employé'),
                   DropdownButton<Person>(
                     items: persons.map((Person person) {
                       return DropdownMenuItem<Person>(
                         value: person,
-                        child: Text(person.firstName),
+                        child: Text(person.userName),
                       );
                     }).toList(),
                     onChanged: (Person? selected) {
-                      selectedPerson = selected!;
+                      setState(() {
+                        selectedPerson = selected!;
+                      });
                     },
+                    hint: selectedPerson != null ? Text('${selectedPerson!.userName}') : Text('Choisissez un employé'),
                   ),
                 ],
               )),
@@ -107,7 +123,7 @@ class _ProjectAssignmentPageState extends State<ProjectAssignmentPage> {
                 backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
               ),
               onPressed: () {
-                _assignProjectToPerson(selectedProject, selectedPerson);
+                _assignProjectToPerson(selectedProject!, selectedPerson!);
                 Navigator.pop(context);
               },
               child: Text("Enregistrer"))

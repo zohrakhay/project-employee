@@ -1,3 +1,4 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:technical_test_mosofty/models/person.dart';
@@ -21,7 +22,7 @@ class _UpdatePersonPage extends State<UpdatePersonPage> {
 
   Future<void> _getOnePerson() async {
     setState(() {
-      isLoading = true; 
+      isLoading = true;
     });
     int? id = int.tryParse(idController.text);
     if (id != null) {
@@ -35,30 +36,30 @@ class _UpdatePersonPage extends State<UpdatePersonPage> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Person details loaded successfully!'),
+            content: Text('Infos récupérés !'),
           ),
         );
         setState(() {
-          isLoading = false; 
+          isLoading = false;
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Person not found'),
+            content: Text('Employé introuvable! '),
           ),
         );
         setState(() {
-          isLoading = false; 
+          isLoading = false;
         });
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Please enter ID'),
+          content: Text('Entrez un id valide'),
         ),
       );
       setState(() {
-        isLoading = false; 
+        isLoading = false;
       });
     }
   }
@@ -72,12 +73,6 @@ class _UpdatePersonPage extends State<UpdatePersonPage> {
         userName: userNameController.text);
     try {
       await PersonService().updatePerson(modifiedPerson);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Person updated successfully!'),
-        ),
-      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -230,6 +225,9 @@ class _UpdatePersonPage extends State<UpdatePersonPage> {
                               if (value == null || value.isEmpty) {
                                 return 'Entrez un email';
                               }
+                              if (!EmailValidator.validate(value)) {
+                                return 'Entrez un email valide';
+                              }
                               return null;
                             },
                           ),
@@ -268,7 +266,15 @@ class _UpdatePersonPage extends State<UpdatePersonPage> {
                           backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
                         ),
                         onPressed: () {
-                          _updatePerson();
+                          if (_formKey.currentState!.validate()) {
+                            _updatePerson();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Employé modifié avec succés!'),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          }
                         },
                         child: Text("Modifier la personne"))
                   ],

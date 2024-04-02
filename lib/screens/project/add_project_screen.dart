@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-//import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:technical_test_mosofty/models/project.dart';
 import 'package:technical_test_mosofty/services/project_service.dart';
 
@@ -16,7 +17,7 @@ class _MyHomePageState extends State<AddProjectPage> {
   TextEditingController descriptionController = TextEditingController();
   TextEditingController latitudeController = TextEditingController();
   TextEditingController longitudeController = TextEditingController();
-  //late GoogleMapController mapController;
+  List<Marker> markers = [];
 
   Future<void> _addProject() async {
     Project newProject = Project(
@@ -26,12 +27,6 @@ class _MyHomePageState extends State<AddProjectPage> {
         latitude: latitudeController.text);
 
     await ProjectService().postProject(newProject);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Project added successfully!'),
-      ),
-    );
   }
 
   @override
@@ -39,7 +34,7 @@ class _MyHomePageState extends State<AddProjectPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
-        title: Text('Ajouter un projet'),
+        title: const Text('Ajouter un projet'),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -55,14 +50,14 @@ class _MyHomePageState extends State<AddProjectPage> {
                       decoration: InputDecoration(
                         labelText: 'Nom du projet',
                         enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.green),
+                          borderSide: const BorderSide(color: Colors.green),
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.green),
+                          borderSide: const BorderSide(color: Colors.green),
                           borderRadius: BorderRadius.circular(10.0),
                         ),
-                        labelStyle: TextStyle(color: Colors.grey),
+                        labelStyle: const TextStyle(color: Colors.grey),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),
@@ -82,14 +77,14 @@ class _MyHomePageState extends State<AddProjectPage> {
                       decoration: InputDecoration(
                         labelText: 'Description',
                         enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.green),
+                          borderSide: const BorderSide(color: Colors.green),
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.green),
+                          borderSide: const BorderSide(color: Colors.green),
                           borderRadius: BorderRadius.circular(10.0),
                         ),
-                        labelStyle: TextStyle(color: Colors.grey),
+                        labelStyle: const TextStyle(color: Colors.grey),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),
@@ -109,64 +104,104 @@ class _MyHomePageState extends State<AddProjectPage> {
                       decoration: InputDecoration(
                         labelText: 'longitude',
                         enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.green),
+                          borderSide: const BorderSide(color: Colors.green),
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.green),
+                          borderSide: const BorderSide(color: Colors.green),
                           borderRadius: BorderRadius.circular(10.0),
                         ),
-                        labelStyle: TextStyle(color: Colors.grey),
+                        labelStyle: const TextStyle(color: Colors.grey),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                       ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Entrez une longitude';
+                        }
+                        return null;
+                      },
                       controller: longitudeController,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: TextField(
+                    child: TextFormField(
                       controller: latitudeController,
                       decoration: InputDecoration(
                         labelText: 'latitude',
                         enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.green),
+                          borderSide: const BorderSide(color: Colors.green),
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.green),
+                          borderSide: const BorderSide(color: Colors.green),
                           borderRadius: BorderRadius.circular(10.0),
                         ),
-                        labelStyle: TextStyle(color: Colors.grey),
+                        labelStyle: const TextStyle(color: Colors.grey),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                       ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Entrez une latitude';
+                        }
+                        return null;
+                      },
                     ),
                   ),
-                  /*   GoogleMap(
-                    initialCameraPosition: const CameraPosition(
-                      target: LatLng(48.8566, 2.3522),
-                      zoom: 15,
+                  SizedBox(
+                    height: 300,
+                    child: FlutterMap(
+                      options: MapOptions(
+                        initialCenter: LatLng(33.892166, 9.56),
+                        onTap: (p, latLng) {
+                          setState(() {
+                            latitudeController.text = latLng.latitude.toString();
+                            longitudeController.text = latLng.longitude.toString();
+                            markers.clear();
+                            markers.add(Marker(
+                              width: 80.0,
+                              height: 80.0,
+                              point: latLng,
+                              child: Container(
+                                child: const Icon(
+                                  Icons.location_pin,
+                                  color: Colors.red,
+                                  size: 40.0,
+                                ),
+                              ),
+                            ));
+                          });
+                        },
+                      ),
+                      children: [
+                        TileLayer(
+                          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          userAgentPackageName: 'com.example.app',
+                        ),
+                        MarkerLayer(markers: markers),
+                      ],
                     ),
-                    onMapCreated: (controller) {
-                      mapController = controller;
-                    },
-                    onTap: (LatLng latLng) {
-                      latitudeController.text = latLng.latitude.toString();
-                      longitudeController.text = latLng.longitude.toString();
-                    },
-                  ),*/
+                  ),
                   ElevatedButton(
                       style: const ButtonStyle(
                         backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
                       ),
                       onPressed: () {
-                        _addProject();
-                        Navigator.pop(context);
+                        if (_formKey.currentState!.validate()) {
+                          _addProject();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Projet ajouté avec succés!'),
+                            ),
+                          );
+                          Navigator.pop(context);
+                        }
                       },
-                      child: Text("Ajouter le projet"))
+                      child: const Text("Ajouter le projet"))
                 ],
               ),
             ),

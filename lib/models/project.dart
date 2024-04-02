@@ -23,7 +23,8 @@ class Project {
   }
 
   Project.fromJson(Map<String, dynamic> json)
-      : name = json['nom'],
+      : id = json['idpro'],
+        name = json['nom'],
         description = json['description'],
         longitude = json['longitude'],
         latitude = json['latitude'];

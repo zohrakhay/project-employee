@@ -4,6 +4,7 @@ import 'package:technical_test_mosofty/screens/persons/person_list_page.dart';
 import 'package:technical_test_mosofty/screens/persons/update_person_screen.dart';
 import 'package:technical_test_mosofty/screens/project/add_project_screen.dart';
 import 'package:technical_test_mosofty/screens/project/project_list_page.dart';
+import 'package:technical_test_mosofty/screens/project_assignment/project_assignment_list_screen.dart';
 import 'package:technical_test_mosofty/screens/project_assignment/project_assignment_screen.dart';
 
 void main() {
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
         '/addProject': (context) => const AddProjectPage(),
         '/listProjects': (context) => ProjectListPage(),
         '/assignProject': (context) => const ProjectAssignmentPage(),
+        '/listProjectAssigned': (context) => ProjectAssignmentListPage(),
       },
     );
   }
@@ -39,8 +41,7 @@ class HomePage extends StatelessWidget {
         ),
         body: GridView(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // Spacing between columns
-              //  childAspectRatio: 1.0, // Aspect ratio of each grid tile
+              crossAxisCount: 2,
             ),
             children: [
               GestureDetector(
@@ -140,12 +141,28 @@ class HomePage extends StatelessWidget {
                         "assets/project-manager.png",
                         height: 50,
                       ),
-                      Text('Assigner un projet'),
+                      Text('Affecter un projet'),
                     ],
                   ),
                 ),
               ),
-            ]) 
-        );
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, '/listProjectAssigned');
+                },
+                child: GridTile(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Image.asset(
+                        "assets/project-done.png",
+                        height: 50,
+                      ),
+                      Text('Les projets affectés'),
+                    ],
+                  ),
+                ),
+              ),
+            ]));
   }
 }

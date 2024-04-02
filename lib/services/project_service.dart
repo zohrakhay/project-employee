@@ -16,9 +16,9 @@ class ProjectService {
 
     if (res.statusCode == 200) {
       dynamic body = jsonDecode(res.body);
-      return Person.fromJson(body['data']);
+      return Person.fromJson(body);
     } else {
-      print("Can't add person");
+      print("Can't add project");
       return null;
     }
   }

@@ -6,7 +6,6 @@ import 'package:technical_test_mosofty/models/project_assignment.dart';
 class PersonService {
   Future<Person?> postPerson(Person newPerson) async {
     Uri myUri = Uri.parse("http://104.225.216.185:9306/persons/new");
-
     dynamic res = await http.post(
       myUri,
       body: jsonEncode(newPerson.toJson()),
@@ -15,7 +14,8 @@ class PersonService {
 
     if (res.statusCode == 200) {
       dynamic body = jsonDecode(res.body);
-      return Person.fromJson(body['data']);
+
+      return Person.fromJson(body);
     } else {
       print("Can't add person");
       return null;
@@ -73,7 +73,7 @@ class PersonService {
     }
   }
 
-  Future<Person?> AssignProjectToPerson(ProjectAssignment projectPerson) async {
+  Future<void> AssignProjectToPerson(ProjectAssignment projectPerson) async {
     Uri myUri = Uri.parse("http://104.225.216.185:9306/projectsdone/UsersProject");
 
     dynamic res = await http.post(
@@ -82,12 +82,11 @@ class PersonService {
       headers: {'Content-Type': 'application/json'},
     );
 
-    if (res.statusCode == 200) {
-      dynamic body = jsonDecode(res.body);
-      return Person.fromJson(body);
+    if (res.statusCode == 200 || res.statusCode == 202) {
+      print("Project Assigned");
     } else {
       print("Can't assign project");
-      return null;
+      throw Exception();
     }
   }
 }

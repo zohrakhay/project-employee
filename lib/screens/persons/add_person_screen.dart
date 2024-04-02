@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:technical_test_mosofty/models/person.dart';
 import 'package:technical_test_mosofty/services/person_service.dart';
+import 'package:email_validator/email_validator.dart';
 
 class AddPersonPage extends StatefulWidget {
   const AddPersonPage({super.key});
@@ -23,11 +24,6 @@ class _AddPersonPageState extends State<AddPersonPage> {
         userName: userNameController.text);
 
     await PersonService().postPerson(newPerson);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Person added successfully!'),
-      ),
-    );
   }
 
   @override
@@ -123,6 +119,9 @@ class _AddPersonPageState extends State<AddPersonPage> {
                         if (value == null || value.isEmpty) {
                           return 'Entrez un email';
                         }
+                        if (!EmailValidator.validate(value)) {
+                          return 'Entrez un email valide';
+                        }
                         return null;
                       },
                     ),
@@ -161,13 +160,12 @@ class _AddPersonPageState extends State<AddPersonPage> {
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           _addPerson();
-                          Navigator.pop(context);
-                        } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Veuilez remplir tous les champs'),
+                              content: Text('Employé ajouté avec succés!'),
                             ),
                           );
+                          Navigator.pop(context);
                         }
                       },
                       child: Text("Ajouter la personne"))

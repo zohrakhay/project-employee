@@ -6,7 +6,7 @@ class Person {
   String email;
 
   Person({
-     this.id,
+    this.id,
     required this.lastName,
     required this.firstName,
     required this.email,
@@ -23,7 +23,8 @@ class Person {
   }
 
   Person.fromJson(Map<String, dynamic> json)
-      : lastName = json['nom'],
+      : id = json['idperson'],
+        lastName = json['nom'],
         firstName = json['prenom'],
         userName = json['username'],
         email = json['mail'];

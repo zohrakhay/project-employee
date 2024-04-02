@@ -17,11 +17,12 @@ class ProjectAssignment {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id.toJson();
-    data['projecto'] = this.project.toJson();
-    data['persono'] = this.person.toJson();
-    return data;
+    return {
+      'project': {'idpro': project.id},
+      'list': [
+        {'id': person.id, 'itemName': person.userName}
+      ],
+    };
   }
 }
 
